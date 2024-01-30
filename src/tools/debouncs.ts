@@ -1,7 +1,7 @@
-export function debounce(fn, delay) {
+export function debounce(fn: Function, delay: number) {
   console.log("防抖");
   // 1.定义一个定时器, 保存上一次的定时器
-  let timer = null;
+  let timer: any = null;
 
   // 2.真正执行的函数
   const _debounce = function () {
