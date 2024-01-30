@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from "vue"
+import { ref, onMounted } from "vue"
 import { searchEngineIcons } from "../source/source"
 const emits = defineEmits(['chooseEngine'])
 interface Engine {
@@ -10,13 +10,19 @@ interface Engine {
 }
 // 当前引擎
 let currentEngine = ref<Engine>(searchEngineIcons[0])
+// 如果浏览器缓存有选择的引擎，那么使用存储的引擎
+onMounted(() => {
+    let localEngine: string = localStorage.getItem('engine') || 'bing'
+    chooseEngine(localEngine)
+})
 // 选择引擎
-function chooseEngine(engineId: number) {
+function chooseEngine(engineKey: string) {
     let engine = searchEngineIcons.find(engine => {
-        return engine.iconId == engineId
+        return engine.key == engineKey
     })
     if (engine != undefined) {
         currentEngine.value = engine
+        localStorage.setItem('engine', engineKey)
         emits('chooseEngine', engine.key)
     }
 }
@@ -41,15 +47,15 @@ function closeChangeEngine() {
     <div class="searchEngine">
         <div class="chooseEngine" v-show="isChangeEngineShow">
             <div class="item" :class="{ currentEngineItem: currentEngine.iconId == icon.iconId }"
-                @click="chooseEngine(icon.iconId)" v-for="(icon) in searchEngineIcons" :key="icon.iconId">
+                @click="chooseEngine(icon.key)" v-for="(icon) in searchEngineIcons" :key="icon.iconId">
                 <div class="img">
-                    <img :src="`/src/assets/searchEngine/${icon.img}`" :alt="icon.name">
+                    <img :src="icon.img" :alt="icon.name">
                 </div>
                 <span>{{ icon.name }}</span>
             </div>
         </div>
         <div class="icon" @click.stop="handleChangeEngineShow(true)" :title="currentEngine.name">
-            <img :src="`/src/assets/searchEngine/${currentEngine.img}`" :alt="currentEngine.name">
+            <img :src="currentEngine.img" :alt="currentEngine.name">
         </div>
     </div>
 </template>

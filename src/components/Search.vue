@@ -3,7 +3,7 @@ import { ref } from "vue"
 import { debounce } from "@/tools/debouncs"
 import SearchEngin from "./SearchEngin.vue";
 import SearchList from "./SearchList.vue"
-import { bingSugApi, baiduSugApi, googleSugApi, sogouSugApi } from "@/apis/sug"
+import { bingSugApi, baiduSugApi, googleSugApi, san60SugApi } from "@/apis/sug"
 import axios from "axios"
 const emits = defineEmits(['handleOverlay'])
 let searchKey = ref("")
@@ -42,6 +42,12 @@ window.sug = {
     },
     google: function (data: any) {
         console.log(data);
+    },
+    san60: function (data: any) {
+        console.log(data.result);
+        searchList.value = data.result.map((item: { word: string }) => {
+            return item.word
+        })
     }
 }
 
@@ -66,10 +72,9 @@ const change = debounce(() => {
                     searchList.value = []
                 }
             })
-        case 'sougou':
-            sogouSugApi(searchKey.value).then(res => {
-                console.log(res);
-                // eval(res.data)
+        case '360':
+            san60SugApi(searchKey.value).then(res => {
+                eval(res.data)
             })
         default:
             break;
@@ -98,11 +103,15 @@ function handleBlur() {
     document.removeEventListener('click', handleBlur)
 }
 
+
 // 当前选择的引擎
 let engine = ref('bing')
+
 // 切换引擎，获取key
 function chooseEngine(key: string) {
     engine.value = key
+    // 清空searchlist 
+    searchList.value = []
 }
 
 // 打开新网页并搜索
@@ -116,6 +125,8 @@ function openPageSearch(engine: string, key: string) {
             break;
         case 'google':
             window.open(`https://www.google.com/search?q=${key}`, "_blank")
+        case '360':
+            window.open(`https://www.so.com/s?ie=utf-8&q=${key}`, "_blank")
             break;
     }
 }

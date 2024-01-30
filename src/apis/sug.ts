@@ -50,12 +50,12 @@ export const googleSugApi = (key: string) => {
  * @param key string
  * @returns axios
  */
-export const sogouSugApi = (key: string) => {
+export const san60SugApi = (key: string) => {
   return axios({
-    url: "/sogou?type=web",
+    url: "/360?encodein=utf-8&encodeout=utf-8&callback=window.sug.san60",
     method: "GET",
     params: {
-      key: key,
+      word: key,
     },
   });
 };
